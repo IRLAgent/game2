@@ -50,26 +50,25 @@ let touchStartX = 0;
 let touchCurrentX = 0;
 let isTouching = false;
 
-canvas.addEventListener('touchstart', (e) => {
-  e.preventDefault();
+document.addEventListener('touchstart', (e) => {
+  if (gameOver) return;
   touchStartX = e.touches[0].clientX;
   touchCurrentX = touchStartX;
   isTouching = true;
-});
+}, { passive: false });
 
-canvas.addEventListener('touchmove', (e) => {
+document.addEventListener('touchmove', (e) => {
   e.preventDefault();
   if (isTouching) {
     touchCurrentX = e.touches[0].clientX;
   }
-});
+}, { passive: false });
 
-canvas.addEventListener('touchend', (e) => {
-  e.preventDefault();
+document.addEventListener('touchend', (e) => {
   isTouching = false;
   touchStartX = 0;
   touchCurrentX = 0;
-});
+}, { passive: false });
 
 // Update player movement
 function updatePlayer() {
@@ -85,10 +84,13 @@ function updatePlayer() {
   
   // Touch controls - move player to follow finger
   if (isTouching) {
-    const targetX = touchCurrentX - (canvas.getBoundingClientRect().left + player.width / 2);
+    const canvasRect = canvas.getBoundingClientRect();
+    const canvasX = touchCurrentX - canvasRect.left;
+    const canvasRelativeX = (canvasX / canvasRect.width) * canvas.width;
+    const targetX = canvasRelativeX - player.width / 2;
     const diff = targetX - player.x;
     
-    if (Math.abs(diff) > 5) {
+    if (Math.abs(diff) > 2) {
       player.dx = Math.sign(diff) * player.speed;
     }
   }
