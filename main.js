@@ -3,9 +3,35 @@ import './style.css'
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Set canvas size to fit mobile screens
+function resizeCanvas() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const aspectRatio = 4 / 3;
+  
+  if (width / height > aspectRatio) {
+    // Width constrained
+    canvas.style.height = height + 'px';
+    canvas.style.width = (height * aspectRatio) + 'px';
+  } else {
+    // Height constrained
+    canvas.style.width = width + 'px';
+    canvas.style.height = (width / aspectRatio) + 'px';
+  }
+}
+
 // Set canvas size
 canvas.width = 800;
 canvas.height = 600;
+
+// Initial resize
+resizeCanvas();
+
+// Resize on orientation change or window resize
+window.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', () => {
+  setTimeout(resizeCanvas, 100);
+});
 
 // Player object
 const player = {
