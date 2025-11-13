@@ -45,15 +45,52 @@ window.addEventListener('keyup', (e) => {
   keys[e.key] = false;
 });
 
+// Touch controls for mobile
+let touchStartX = 0;
+let touchCurrentX = 0;
+let isTouching = false;
+
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  touchStartX = e.touches[0].clientX;
+  touchCurrentX = touchStartX;
+  isTouching = true;
+});
+
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if (isTouching) {
+    touchCurrentX = e.touches[0].clientX;
+  }
+});
+
+canvas.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  isTouching = false;
+  touchStartX = 0;
+  touchCurrentX = 0;
+});
+
 // Update player movement
 function updatePlayer() {
   player.dx = 0;
   
+  // Keyboard controls
   if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
     player.dx = -player.speed;
   }
   if (keys['ArrowRight'] || keys['d'] || keys['D']) {
     player.dx = player.speed;
+  }
+  
+  // Touch controls - move player to follow finger
+  if (isTouching) {
+    const targetX = touchCurrentX - (canvas.getBoundingClientRect().left + player.width / 2);
+    const diff = targetX - player.x;
+    
+    if (Math.abs(diff) > 5) {
+      player.dx = Math.sign(diff) * player.speed;
+    }
   }
   
   player.x += player.dx;
