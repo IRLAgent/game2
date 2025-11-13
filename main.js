@@ -77,13 +77,35 @@ let touchCurrentX = 0;
 let isTouching = false;
 
 document.addEventListener('touchstart', (e) => {
-  if (gameOver) return;
+  // Handle restart button first if game is over
+  if (gameOver) {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const touchX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+    const touchY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+    
+    const buttonWidth = 250;
+    const buttonHeight = 60;
+    const buttonX = canvas.width / 2 - buttonWidth / 2;
+    const buttonY = canvas.height / 2 + 60;
+    
+    if (touchX >= buttonX && touchX <= buttonX + buttonWidth &&
+        touchY >= buttonY && touchY <= buttonY + buttonHeight) {
+      e.preventDefault();
+      resetGame();
+      return;
+    }
+    return; // Don't handle movement when game is over
+  }
+  
+  // Movement controls
   touchStartX = e.touches[0].clientX;
   touchCurrentX = touchStartX;
   isTouching = true;
 }, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
+  if (gameOver) return;
   e.preventDefault();
   if (isTouching) {
     touchCurrentX = e.touches[0].clientX;
@@ -91,6 +113,7 @@ document.addEventListener('touchmove', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
+  if (gameOver) return;
   isTouching = false;
   touchStartX = 0;
   touchCurrentX = 0;
@@ -733,8 +756,8 @@ function resetGame() {
 
 // Draw restart button
 function drawRestartButton() {
-  const buttonWidth = 200;
-  const buttonHeight = 50;
+  const buttonWidth = 250;
+  const buttonHeight = 60;
   const buttonX = canvas.width / 2 - buttonWidth / 2;
   const buttonY = canvas.height / 2 + 60;
   
@@ -742,9 +765,9 @@ function drawRestartButton() {
   ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
   
   ctx.fillStyle = '#ffffff';
-  ctx.font = '24px Arial';
+  ctx.font = 'bold 28px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Restart', canvas.width / 2, buttonY + 33);
+  ctx.fillText('Restart', canvas.width / 2, buttonY + 40);
   
   return { x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight };
 }
@@ -754,11 +777,11 @@ canvas.addEventListener('click', (e) => {
   if (!gameOver) return;
   
   const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
+  const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
   
-  const buttonWidth = 200;
-  const buttonHeight = 50;
+  const buttonWidth = 250;
+  const buttonHeight = 60;
   const buttonX = canvas.width / 2 - buttonWidth / 2;
   const buttonY = canvas.height / 2 + 60;
   
@@ -767,6 +790,9 @@ canvas.addEventListener('click', (e) => {
     resetGame();
   }
 });
+
+// Handle touch on restart button for mobile - handled in document touchstart above
+// (Removed duplicate listener)
 
 // Clear canvas
 function clearCanvas() {
