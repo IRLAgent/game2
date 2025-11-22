@@ -166,7 +166,7 @@ function createObstacle() {
   const maxAttempts = 20;
   
   // Create multiple individual bananas
-  const numBananas = Math.floor(Math.random() * 4) + 3; // 3-6 bananas
+  const numBananas = Math.floor(Math.random() * 2) + 1; // 1-2 bananas
   
   for (let i = 0; i < numBananas; i++) {
     let placed = false;
